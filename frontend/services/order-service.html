@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Service - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/service-styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Order Service</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content service-content">
+        <div class="container">
+            <div class="service-header">
+                <h1>Order Management Service</h1>
+                <p>Track and manage all orders</p>
+            </div>
+
+            <!-- Service Stats -->
+            <div class="service-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-orders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pending-orders">0</div>
+                    <div class="stat-label">Pending Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-revenue">$0.00</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="service-controls">
+                <input type="text" id="order-search" placeholder="Search orders..." class="search-box">
+                <select id="status-filter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                </select>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="table-responsive">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-orders-tbody">
+                        <tr><td colspan="6" class="loading">Loading orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Order Timeline Section -->
+            <div class="service-section" style="margin-top: 40px;">
+                <h2>Order Timeline</h2>
+                <div id="order-timeline" class="timeline">
+                    <div class="empty-message">Select an order to view timeline</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Order Service API | Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script>
+        let allOrders = [];
+
+        async function loadServiceOrders() {
+            console.log('[v0] Loading orders for service view');
+            try {
+                allOrders = await api.getOrders();
+                renderServiceOrders(allOrders);
+                updateOrderStats();
+            } catch (error) {
+                console.error('[v0] Error loading orders:', error);
+            }
+        }
+
+        function renderServiceOrders(orders) {
+            const tbody = document.getElementById('service-orders-tbody');
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-message">No orders</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.customer}</td>
+                    <td>$${order.total.toFixed(2)}</td>
+                    <td><span class="badge badge-${order.status}">${order.status.toUpperCase()}</span></td>
+                    <td>${order.date}</td>
+                    <td>
+                        <button class="btn btn-primary btn-small" onclick="viewOrderDetails('${order.id}')">View</button>
+                        <button class="btn btn-secondary btn-small" onclick="updateOrderFlow('${order.id}')">Update</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateOrderStats() {
+            document.getElementById('total-orders').textContent = allOrders.length;
+            const pending = allOrders.filter(o => o.status === 'pending').length;
+            const revenue = allOrders.reduce((sum, o) => sum + o.total, 0);
+            document.getElementById('pending-orders').textContent = pending;
+            document.getElementById('total-revenue').textContent = `$${revenue.toFixed(2)}`;
+        }
+
+        function viewOrderDetails(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                const timeline = `
+                    <div style="padding: 20px; background-color: var(--background-color); border-radius: 6px;">
+                        <h3>${order.id}</h3>
+                        <p><strong>Customer:</strong> ${order.customer}</p>
+                        <p><strong>Status:</strong> <span class="badge badge-${order.status}">${order.status.toUpperCase()}</span></p>
+                        <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+                        <p><strong>Date:</strong> ${order.date}</p>
+                        <h4 style="margin-top: 20px;">Items:</h4>
+                        <ul style="margin-left: 20px;">
+                            ${order.items.map(item => `
+                                <li>${item.name} (Qty: ${item.qty}) - $${(item.price * item.qty).toFixed(2)}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                document.getElementById('order-timeline').innerHTML = timeline;
+            }
+        }
+
+        function updateOrderFlow(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            const statuses = ['pending', 'processing', 'shipped', 'delivered'];
+            const currentIndex = statuses.indexOf(order.status);
+            const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+            
+            api.updateOrderStatus(orderId, nextStatus).then(() => {
+                loadServiceOrders();
+            });
+        }
+
+        // Search functionality
+        document.getElementById('order-search')?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#service-orders-tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Status filter
+        document.getElementById('status-filter')?.addEventListener('change', (e) => {
+            const status = e.target.value;
+            const filtered = status ? allOrders.filter(o => o.status === status) : allOrders;
+            renderServiceOrders(filtered);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadServiceOrders);
+    </script>
+</body>
+</html>

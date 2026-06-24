@@ -1,0 +1,10 @@
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\config\OpenApiConfig.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\config\SecurityConfig.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\controller\InventoryController.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\dto\InventoryRequest.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\dto\InventoryResponse.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\dto\StockUpdateRequest.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\entity\Inventory.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\InventoryServiceApplication.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\repository\InventoryRepository.java
+C:\Users\Ariharan\Downloads\E-commerce\inventory-service\src\main\java\com\ecommerce\inventory\service\InventoryService.java

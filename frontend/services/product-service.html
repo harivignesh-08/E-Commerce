@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Service - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/service-styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Product Service</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content service-content">
+        <div class="container">
+            <div class="service-header">
+                <h1>Product Management Service</h1>
+                <p>Manage product catalog and inventory</p>
+            </div>
+
+            <!-- Service Stats -->
+            <div class="service-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-products">0</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="active-products">0</div>
+                    <div class="stat-label">Active Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-categories">0</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+            </div>
+
+            <!-- Service Controls -->
+            <div class="service-controls">
+                <input type="text" id="service-search" placeholder="Search products..." class="search-box">
+                <button class="btn btn-primary" onclick="openServiceModal()">Add New Product</button>
+            </div>
+
+            <!-- Products Table -->
+            <div class="table-responsive">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-products-tbody">
+                        <tr><td colspan="6" class="loading">Loading products...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Product Modal -->
+    <div id="service-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeServiceModal()">&times;</span>
+            <h2>Product Details</h2>
+            <form id="service-form" class="form">
+                <input type="text" id="service-product-name" placeholder="Product Name" required class="form-input">
+                <textarea id="service-product-desc" placeholder="Description" class="form-input"></textarea>
+                <input type="number" id="service-product-price" placeholder="Price" step="0.01" required class="form-input">
+                <input type="text" id="service-product-category" placeholder="Category" class="form-input">
+                <select id="service-product-status" class="form-input">
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="discontinued">Discontinued</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-block">Save Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Product Service API | Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script>
+        async function loadServiceProducts() {
+            console.log('[v0] Loading products for service view');
+            try {
+                const products = await api.getProducts();
+                renderServiceProducts(products);
+                updateServiceStats(products);
+            } catch (error) {
+                console.error('[v0] Error loading products:', error);
+            }
+        }
+
+        function renderServiceProducts(products) {
+            const tbody = document.getElementById('service-products-tbody');
+            if (!products || products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-message">No products</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.id}</td>
+                    <td>${p.name}</td>
+                    <td>${p.category}</td>
+                    <td>$${p.price.toFixed(2)}</td>
+                    <td><span class="badge badge-active">Active</span></td>
+                    <td>
+                        <button class="btn btn-primary btn-small" onclick="editServiceProduct(${p.id})">Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteServiceProduct(${p.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateServiceStats(products) {
+            document.getElementById('total-products').textContent = products.length;
+            document.getElementById('active-products').textContent = products.filter(p => p.stock > 0).length;
+            const categories = new Set(products.map(p => p.category));
+            document.getElementById('total-categories').textContent = categories.size;
+        }
+
+        function openServiceModal() {
+            document.getElementById('service-modal').classList.add('show');
+        }
+
+        function closeServiceModal() {
+            document.getElementById('service-modal').classList.remove('show');
+        }
+
+        function editServiceProduct(id) {
+            console.log('[v0] Editing product:', id);
+            openServiceModal();
+        }
+
+        async function deleteServiceProduct(id) {
+            if (confirm('Delete this product?')) {
+                await api.deleteProduct(id);
+                loadServiceProducts();
+            }
+        }
+
+        // Search functionality
+        document.getElementById('service-search')?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#service-products-tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadServiceProducts);
+    </script>
+</body>
+</html>

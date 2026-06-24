@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Service - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/service-styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">User Service</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content service-content">
+        <div class="container">
+            <div class="service-header">
+                <h1>User Management Service</h1>
+                <p>Manage users and authentication</p>
+            </div>
+
+            <!-- Service Stats -->
+            <div class="service-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-users">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="active-users">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="new-users">0</div>
+                    <div class="stat-label">New (This Month)</div>
+                </div>
+            </div>
+
+            <!-- User Controls -->
+            <div class="service-controls">
+                <input type="text" id="user-search" placeholder="Search users..." class="search-box">
+                <button class="btn btn-primary" onclick="openUserModal()">Add User</button>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-responsive">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-users-tbody">
+                        <tr><td colspan="7" class="loading">Loading users...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- User Roles Section -->
+            <div class="service-section" style="margin-top: 40px;">
+                <h2>User Roles & Permissions</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 15px;">
+                        <h4>Admin</h4>
+                        <p style="font-size: 13px; color: var(--text-secondary);">Full access to all features and data</p>
+                    </div>
+                    <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 15px;">
+                        <h4>Customer</h4>
+                        <p style="font-size: 13px; color: var(--text-secondary);">Browse products, cart, checkout, orders</p>
+                    </div>
+                    <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 15px;">
+                        <h4>Vendor</h4>
+                        <p style="font-size: 13px; color: var(--text-secondary);">Manage own products and inventory</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- User Modal -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeUserModal()">&times;</span>
+            <h2>Add/Edit User</h2>
+            <form id="user-form" class="form">
+                <input type="text" id="user-full-name" placeholder="Full Name" required class="form-input">
+                <input type="email" id="user-email" placeholder="Email" required class="form-input">
+                <input type="password" id="user-password" placeholder="Password" class="form-input">
+                <select id="user-role" class="form-input" required>
+                    <option value="">Select Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="customer">Customer</option>
+                    <option value="vendor">Vendor</option>
+                </select>
+                <select id="user-status" class="form-input" required>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-block">Save User</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>User Service API | Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script>
+        let allUsers = [];
+
+        async function loadServiceUsers() {
+            console.log('[v0] Loading users for service view');
+            try {
+                allUsers = await api.getUsers();
+                renderServiceUsers(allUsers);
+                updateUserStats();
+            } catch (error) {
+                console.error('[v0] Error loading users:', error);
+            }
+        }
+
+        function renderServiceUsers(users) {
+            const tbody = document.getElementById('service-users-tbody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No users</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td><span class="badge badge-role">${user.role.toUpperCase()}</span></td>
+                    <td><span class="badge badge-${user.status}">${user.status.toUpperCase()}</span></td>
+                    <td>${user.createdDate || '2024-01-15'}</td>
+                    <td>
+                        <button class="btn btn-primary btn-small" onclick="editUser(${user.id})">Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteUser(${user.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateUserStats() {
+            document.getElementById('total-users').textContent = allUsers.length;
+            const active = allUsers.filter(u => u.status === 'active').length;
+            const newUsersCount = allUsers.filter(u => u.role === 'customer').length;
+            document.getElementById('active-users').textContent = active;
+            document.getElementById('new-users').textContent = Math.floor(newUsersCount * 0.3);
+        }
+
+        function openUserModal() {
+            document.getElementById('user-modal').classList.add('show');
+        }
+
+        function closeUserModal() {
+            document.getElementById('user-modal').classList.remove('show');
+            document.getElementById('user-form').reset();
+        }
+
+        function editUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (user) {
+                document.getElementById('user-full-name').value = user.name;
+                document.getElementById('user-email').value = user.email;
+                document.getElementById('user-role').value = user.role;
+                document.getElementById('user-status').value = user.status;
+                openUserModal();
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Delete this user?')) {
+                const index = allUsers.findIndex(u => u.id === userId);
+                if (index >= 0) {
+                    allUsers.splice(index, 1);
+                    loadServiceUsers();
+                }
+            }
+        }
+
+        // Search functionality
+        document.getElementById('user-search')?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#service-users-tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Form submission
+        document.getElementById('user-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userData = {
+                name: document.getElementById('user-full-name').value,
+                email: document.getElementById('user-email').value,
+                role: document.getElementById('user-role').value,
+                status: document.getElementById('user-status').value
+            };
+            
+            // Add new user or update existing
+            const existingUser = allUsers.find(u => u.email === userData.email);
+            if (!existingUser) {
+                allUsers.push({
+                    id: Math.max(...allUsers.map(u => u.id || 0)) + 1,
+                    ...userData,
+                    createdDate: new Date().toISOString().split('T')[0]
+                });
+            }
+            
+            loadServiceUsers();
+            closeUserModal();
+            alert('User saved successfully');
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadServiceUsers);
+    </script>
+</body>
+</html>

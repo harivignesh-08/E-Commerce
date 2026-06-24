@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Service - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/service-styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Notification Service</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content service-content">
+        <div class="container">
+            <div class="service-header">
+                <h1>Notification Management Service</h1>
+                <p>Manage and send notifications to users</p>
+            </div>
+
+            <!-- Service Stats -->
+            <div class="service-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-notifications">0</div>
+                    <div class="stat-label">Total Notifications</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="unread-count">0</div>
+                    <div class="stat-label">Unread</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pending-sends">0</div>
+                    <div class="stat-label">Pending Sends</div>
+                </div>
+            </div>
+
+            <!-- Notification Controls -->
+            <div class="service-controls">
+                <select id="notification-filter" class="filter-select">
+                    <option value="">All Notifications</option>
+                    <option value="email">Email</option>
+                    <option value="sms">SMS</option>
+                    <option value="push">Push</option>
+                </select>
+                <button class="btn btn-primary" onclick="openNotificationModal()">Send Notification</button>
+            </div>
+
+            <!-- Notifications Table -->
+            <div class="table-responsive">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>Notification ID</th>
+                            <th>Type</th>
+                            <th>Recipient</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Sent Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-notifications-tbody">
+                        <tr><td colspan="7" class="loading">Loading notifications...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Notification Template Section -->
+            <div class="service-section" style="margin-top: 40px;">
+                <h2>Notification Templates</h2>
+                <div id="templates-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Send Notification Modal -->
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeNotificationModal()">&times;</span>
+            <h2>Send Notification</h2>
+            <form id="notification-form" class="form">
+                <select id="notif-type" class="form-input" required>
+                    <option value="">Select Type</option>
+                    <option value="email">Email</option>
+                    <option value="sms">SMS</option>
+                    <option value="push">Push Notification</option>
+                </select>
+                <input type="email" id="notif-recipient" placeholder="Recipient Email/Phone" class="form-input" required>
+                <input type="text" id="notif-subject" placeholder="Subject" class="form-input" required>
+                <textarea id="notif-message" placeholder="Message" class="form-input" required></textarea>
+                <button type="submit" class="btn btn-primary btn-block">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Notification Service API | Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const mockNotifications = [
+            { id: 'NOTIF-001', type: 'email', recipient: 'john@example.com', message: 'Order ORD-001 has been shipped', status: 'sent', date: '2024-06-10' },
+            { id: 'NOTIF-002', type: 'sms', recipient: '+1234567890', message: 'Your order is being processed', status: 'sent', date: '2024-06-15' },
+            { id: 'NOTIF-003', type: 'push', recipient: 'user123', message: 'New products available', status: 'pending', date: '2024-06-24' },
+            { id: 'NOTIF-004', type: 'email', recipient: 'jane@example.com', message: 'Order ORD-002 delivered', status: 'sent', date: '2024-06-20' },
+        ];
+
+        const templates = [
+            { name: 'Order Confirmation', content: 'Thank you for your order. Order ID: [ORDER_ID]' },
+            { name: 'Shipment Notification', content: 'Your order has been shipped. Tracking: [TRACKING_ID]' },
+            { name: 'Delivery Confirmation', content: 'Your order has been delivered. Thank you!' },
+            { name: 'Payment Reminder', content: 'Payment pending for order [ORDER_ID]' }
+        ];
+
+        async function loadServiceNotifications() {
+            console.log('[v0] Loading notifications for service view');
+            try {
+                renderServiceNotifications(mockNotifications);
+                updateNotificationStats();
+                renderTemplates();
+            } catch (error) {
+                console.error('[v0] Error loading notifications:', error);
+            }
+        }
+
+        function renderServiceNotifications(notifications) {
+            const tbody = document.getElementById('service-notifications-tbody');
+            if (!notifications || notifications.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No notifications</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = notifications.map(notif => `
+                <tr>
+                    <td>${notif.id}</td>
+                    <td><span class="badge badge-${notif.type}">${notif.type.toUpperCase()}</span></td>
+                    <td>${notif.recipient}</td>
+                    <td>${notif.message.substring(0, 50)}...</td>
+                    <td><span class="badge badge-${notif.status}">${notif.status.toUpperCase()}</span></td>
+                    <td>${notif.date}</td>
+                    <td>
+                        <button class="btn btn-primary btn-small" onclick="viewNotification('${notif.id}')">View</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteNotification('${notif.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateNotificationStats() {
+            document.getElementById('total-notifications').textContent = mockNotifications.length;
+            const unread = mockNotifications.filter(n => n.status !== 'sent').length;
+            const pending = mockNotifications.filter(n => n.status === 'pending').length;
+            document.getElementById('unread-count').textContent = unread;
+            document.getElementById('pending-sends').textContent = pending;
+        }
+
+        function renderTemplates() {
+            const container = document.getElementById('templates-list');
+            container.innerHTML = templates.map(template => `
+                <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 15px; background-color: var(--surface-color);">
+                    <h4>${template.name}</h4>
+                    <p style="color: var(--text-secondary); font-size: 14px;">${template.content}</p>
+                    <button class="btn btn-primary btn-small" onclick="useTemplate('${template.name}')">Use Template</button>
+                </div>
+            `).join('');
+        }
+
+        function openNotificationModal() {
+            document.getElementById('notification-modal').classList.add('show');
+        }
+
+        function closeNotificationModal() {
+            document.getElementById('notification-modal').classList.remove('show');
+        }
+
+        function viewNotification(notifId) {
+            const notif = mockNotifications.find(n => n.id === notifId);
+            if (notif) {
+                alert(`${notif.id}\nType: ${notif.type}\nRecipient: ${notif.recipient}\n\nMessage:\n${notif.message}`);
+            }
+        }
+
+        function deleteNotification(notifId) {
+            if (confirm('Delete this notification?')) {
+                const index = mockNotifications.findIndex(n => n.id === notifId);
+                if (index >= 0) {
+                    mockNotifications.splice(index, 1);
+                    loadServiceNotifications();
+                }
+            }
+        }
+
+        function useTemplate(templateName) {
+            const template = templates.find(t => t.name === templateName);
+            if (template) {
+                document.getElementById('notif-subject').value = templateName;
+                document.getElementById('notif-message').value = template.content;
+            }
+        }
+
+        // Filter functionality
+        document.getElementById('notification-filter')?.addEventListener('change', (e) => {
+            const type = e.target.value;
+            const filtered = type ? mockNotifications.filter(n => n.type === type) : mockNotifications;
+            renderServiceNotifications(filtered);
+        });
+
+        // Form submission
+        document.getElementById('notification-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = document.getElementById('notif-type').value;
+            const recipient = document.getElementById('notif-recipient').value;
+            const subject = document.getElementById('notif-subject').value;
+            const message = document.getElementById('notif-message').value;
+            
+            const newNotif = {
+                id: 'NOTIF-' + String(mockNotifications.length + 1).padStart(3, '0'),
+                type,
+                recipient,
+                message: subject + ': ' + message,
+                status: 'pending',
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            mockNotifications.push(newNotif);
+            loadServiceNotifications();
+            closeNotificationModal();
+            document.getElementById('notification-form').reset();
+            alert('Notification queued for sending');
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadServiceNotifications);
+    </script>
+</body>
+</html>

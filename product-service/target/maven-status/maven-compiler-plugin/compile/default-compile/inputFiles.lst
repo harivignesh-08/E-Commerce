@@ -1,0 +1,14 @@
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\config\OpenApiConfig.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\config\SecurityConfig.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\controller\ProductController.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\dto\CategoryRequest.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\dto\CategoryResponse.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\dto\ProductRequest.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\dto\ProductResponse.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\entity\Category.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\entity\Product.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\ProductServiceApplication.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\repository\CategoryRepository.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\repository\ProductRepository.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\service\CategoryService.java
+C:\Users\Ariharan\Downloads\E-commerce\product-service\src\main\java\com\ecommerce\product\service\ProductService.java

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Service - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/service-styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Cart Service</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content service-content">
+        <div class="container">
+            <div class="service-header">
+                <h1>Shopping Cart Service</h1>
+                <p>Manage shopping carts and items</p>
+            </div>
+
+            <!-- Service Stats -->
+            <div class="service-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-carts">0</div>
+                    <div class="stat-label">Active Carts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-items">0</div>
+                    <div class="stat-label">Items in Carts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="cart-value">$0.00</div>
+                    <div class="stat-label">Total Value</div>
+                </div>
+            </div>
+
+            <!-- Cart Operations -->
+            <div class="service-controls">
+                <button class="btn btn-primary" onclick="refreshCarts()">Refresh Carts</button>
+                <button class="btn btn-secondary" onclick="clearAllCarts()">Clear All Carts</button>
+            </div>
+
+            <!-- Carts Table -->
+            <div class="table-responsive">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>Cart ID</th>
+                            <th>Items</th>
+                            <th>Total Value</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-carts-tbody">
+                        <tr><td colspan="5" class="loading">Loading carts...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cart Details Section -->
+            <div class="service-section" style="margin-top: 40px;">
+                <h2>Current Cart Details</h2>
+                <div class="cart-details">
+                    <div id="cart-details-content" class="empty-message">No cart loaded</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Cart Service API | Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const mockCarts = [
+            {
+                id: 'CART-001',
+                items: 3,
+                total: 1189.97,
+                date: '2024-06-24',
+                contents: [
+                    { id: 1, name: 'Laptop', qty: 1, price: 999.99 },
+                    { id: 3, name: 'T-Shirt', qty: 3, price: 29.99 }
+                ]
+            },
+            {
+                id: 'CART-002',
+                items: 2,
+                total: 149.98,
+                date: '2024-06-24',
+                contents: [
+                    { id: 4, name: 'Jeans', qty: 2, price: 59.99 }
+                ]
+            }
+        ];
+
+        async function loadServiceCarts() {
+            console.log('[v0] Loading carts for service view');
+            try {
+                renderServiceCarts(mockCarts);
+                updateCartStats();
+            } catch (error) {
+                console.error('[v0] Error loading carts:', error);
+            }
+        }
+
+        function renderServiceCarts(carts) {
+            const tbody = document.getElementById('service-carts-tbody');
+            if (!carts || carts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-message">No active carts</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = carts.map(cart => `
+                <tr>
+                    <td>${cart.id}</td>
+                    <td>${cart.items}</td>
+                    <td>$${cart.total.toFixed(2)}</td>
+                    <td>${cart.date}</td>
+                    <td>
+                        <button class="btn btn-primary btn-small" onclick="viewCart('${cart.id}')">View</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteCart('${cart.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateCartStats() {
+            document.getElementById('total-carts').textContent = mockCarts.length;
+            const totalItems = mockCarts.reduce((sum, c) => sum + c.items, 0);
+            const totalValue = mockCarts.reduce((sum, c) => sum + c.total, 0);
+            document.getElementById('total-items').textContent = totalItems;
+            document.getElementById('cart-value').textContent = `$${totalValue.toFixed(2)}`;
+        }
+
+        function viewCart(cartId) {
+            const cart = mockCarts.find(c => c.id === cartId);
+            if (cart) {
+                const content = `
+                    <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 15px;">
+                        <h3>${cart.id}</h3>
+                        <table style="width: 100%; margin-top: 15px;">
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <th style="text-align: left; padding: 10px;">Product</th>
+                                <th style="text-align: right; padding: 10px;">Qty</th>
+                                <th style="text-align: right; padding: 10px;">Price</th>
+                                <th style="text-align: right; padding: 10px;">Total</th>
+                            </tr>
+                            ${cart.contents.map(item => `
+                                <tr>
+                                    <td style="padding: 10px;">${item.name}</td>
+                                    <td style="text-align: right; padding: 10px;">${item.qty}</td>
+                                    <td style="text-align: right; padding: 10px;">$${item.price.toFixed(2)}</td>
+                                    <td style="text-align: right; padding: 10px;">$${(item.qty * item.price).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                            <tr style="border-top: 2px solid var(--primary-color); font-weight: bold;">
+                                <td colspan="3" style="text-align: right; padding: 10px;">Total:</td>
+                                <td style="text-align: right; padding: 10px;">$${cart.total.toFixed(2)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+                document.getElementById('cart-details-content').innerHTML = content;
+            }
+        }
+
+        function deleteCart(cartId) {
+            if (confirm('Delete this cart?')) {
+                const index = mockCarts.findIndex(c => c.id === cartId);
+                if (index >= 0) {
+                    mockCarts.splice(index, 1);
+                    loadServiceCarts();
+                }
+            }
+        }
+
+        function refreshCarts() {
+            console.log('[v0] Refreshing carts');
+            loadServiceCarts();
+        }
+
+        function clearAllCarts() {
+            if (confirm('Clear all carts?')) {
+                mockCarts.length = 0;
+                loadServiceCarts();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadServiceCarts);
+    </script>
+</body>
+</html>

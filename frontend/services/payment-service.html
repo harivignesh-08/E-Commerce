@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Service - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/service-styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Payment Service</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content service-content">
+        <div class="container">
+            <div class="service-header">
+                <h1>Payment Processing Service</h1>
+                <p>Manage transactions and payments</p>
+            </div>
+
+            <!-- Service Stats -->
+            <div class="service-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-transactions">0</div>
+                    <div class="stat-label">Transactions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successful-payments">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-amount">$0.00</div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+            </div>
+
+            <!-- Payment Filter -->
+            <div class="service-controls">
+                <select id="payment-filter" class="filter-select">
+                    <option value="">All Transactions</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                    <option value="refunded">Refunded</option>
+                </select>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="table-responsive">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Order ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Method</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-payments-tbody">
+                        <tr><td colspan="7" class="loading">Loading transactions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Refund Section -->
+            <div class="service-section" style="margin-top: 40px;">
+                <h2>Process Refund</h2>
+                <form id="refund-form" style="max-width: 500px;">
+                    <div class="form-row full">
+                        <input type="text" id="refund-txn-id" placeholder="Transaction ID" class="form-input">
+                    </div>
+                    <div class="form-row full">
+                        <input type="number" id="refund-amount" placeholder="Refund Amount" step="0.01" class="form-input">
+                    </div>
+                    <div class="form-row full">
+                        <textarea id="refund-reason" placeholder="Reason for refund" class="form-input"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Process Refund</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Payment Service API | Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const mockPayments = [
+            { id: 'TXN-001', orderId: 'ORD-001', amount: 1059.98, status: 'completed', method: 'credit_card', date: '2024-06-10' },
+            { id: 'TXN-002', orderId: 'ORD-002', amount: 89.97, status: 'completed', method: 'debit_card', date: '2024-06-15' },
+            { id: 'TXN-003', orderId: 'ORD-003', amount: 299.99, status: 'pending', method: 'paypal', date: '2024-06-24' },
+            { id: 'TXN-004', orderId: 'ORD-004', amount: 150.00, status: 'failed', method: 'credit_card', date: '2024-06-23' },
+        ];
+
+        async function loadServicePayments() {
+            console.log('[v0] Loading payments for service view');
+            try {
+                renderServicePayments(mockPayments);
+                updatePaymentStats();
+            } catch (error) {
+                console.error('[v0] Error loading payments:', error);
+            }
+        }
+
+        function renderServicePayments(payments) {
+            const tbody = document.getElementById('service-payments-tbody');
+            if (!payments || payments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">No transactions</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = payments.map(payment => `
+                <tr>
+                    <td>${payment.id}</td>
+                    <td>${payment.orderId}</td>
+                    <td>$${payment.amount.toFixed(2)}</td>
+                    <td><span class="badge badge-${payment.status}">${payment.status.toUpperCase()}</span></td>
+                    <td>${payment.method.replace('_', ' ')}</td>
+                    <td>${payment.date}</td>
+                    <td>
+                        <button class="btn btn-primary btn-small" onclick="viewPaymentDetails('${payment.id}')">View</button>
+                        ${payment.status === 'completed' ? `<button class="btn btn-warning btn-small" onclick="refundPayment('${payment.id}')">Refund</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePaymentStats() {
+            document.getElementById('total-transactions').textContent = mockPayments.length;
+            const successful = mockPayments.filter(p => p.status === 'completed').length;
+            const total = mockPayments.reduce((sum, p) => sum + p.amount, 0);
+            document.getElementById('successful-payments').textContent = successful;
+            document.getElementById('total-amount').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function viewPaymentDetails(txnId) {
+            const payment = mockPayments.find(p => p.id === txnId);
+            if (payment) {
+                alert(`Transaction ID: ${payment.id}\nOrder: ${payment.orderId}\nAmount: $${payment.amount}\nStatus: ${payment.status}\nMethod: ${payment.method}`);
+            }
+        }
+
+        function refundPayment(txnId) {
+            const payment = mockPayments.find(p => p.id === txnId);
+            if (payment) {
+                document.getElementById('refund-txn-id').value = txnId;
+                document.getElementById('refund-amount').value = payment.amount;
+            }
+        }
+
+        // Filter functionality
+        document.getElementById('payment-filter')?.addEventListener('change', (e) => {
+            const status = e.target.value;
+            const filtered = status ? mockPayments.filter(p => p.status === status) : mockPayments;
+            renderServicePayments(filtered);
+        });
+
+        // Refund form submission
+        document.getElementById('refund-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const txnId = document.getElementById('refund-txn-id').value;
+            const amount = document.getElementById('refund-amount').value;
+            
+            const payment = mockPayments.find(p => p.id === txnId);
+            if (payment) {
+                payment.status = 'refunded';
+                loadServicePayments();
+                document.getElementById('refund-form').reset();
+                alert('Refund processed successfully');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadServicePayments);
+    </script>
+</body>
+</html>

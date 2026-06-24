@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .service-card {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .service-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+        }
+
+        .service-card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .service-card-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .service-card-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .service-card-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .service-card-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .service-endpoints {
+            font-size: 12px;
+            background-color: var(--background-color);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .service-endpoints strong {
+            color: var(--primary-color);
+        }
+
+        .service-endpoints ul {
+            margin: 5px 0;
+            padding-left: 15px;
+        }
+
+        .service-endpoints li {
+            margin: 3px 0;
+        }
+
+        .service-card-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+        }
+
+        .service-card-footer a {
+            flex: 1;
+        }
+
+        .hero-services {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 60px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero-services h1 {
+            margin: 0 0 10px 0;
+            font-size: 42px;
+        }
+
+        .hero-services p {
+            margin: 0;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .services-info {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .services-info h2 {
+            margin-top: 0;
+        }
+
+        .services-info p {
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-services h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">E-Shop Services</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <div class="hero-services">
+                <h1>Microservices Architecture</h1>
+                <p>Explore and manage individual E-Commerce services</p>
+            </div>
+
+            <!-- Info Section -->
+            <div class="services-info">
+                <h2>About the Services</h2>
+                <p>
+                    This E-Commerce platform is built using a microservices architecture, where each service
+                    handles a specific business domain. Each service has its own dedicated UI for management
+                    and monitoring. Click on any service card below to access its management interface.
+                </p>
+            </div>
+
+            <!-- Services Grid -->
+            <div class="services-grid">
+                <!-- Product Service -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-card-icon">📦</div>
+                        <h3>Product Service</h3>
+                    </div>
+                    <div class="service-card-body">
+                        <p class="service-card-description">
+                            Manage product catalog, categories, and product information. Handle product creation,
+                            updates, and deletions.
+                        </p>
+                        <div class="service-endpoints">
+                            <strong>Key Endpoints:</strong>
+                            <ul>
+                                <li>GET /products</li>
+                                <li>POST /products</li>
+                                <li>PUT /products/:id</li>
+                                <li>DELETE /products/:id</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="service-card-footer">
+                        <a href="product-service.html" class="btn btn-primary btn-block">Manage</a>
+                    </div>
+                </div>
+
+                <!-- Cart Service -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-card-icon">🛒</div>
+                        <h3>Cart Service</h3>
+                    </div>
+                    <div class="service-card-body">
+                        <p class="service-card-description">
+                            Manage shopping carts for users. Handle cart items, quantities, and cart operations.
+                        </p>
+                        <div class="service-endpoints">
+                            <strong>Key Endpoints:</strong>
+                            <ul>
+                                <li>GET /carts</li>
+                                <li>POST /carts</li>
+                                <li>PUT /carts/:id</li>
+                                <li>DELETE /carts/:id</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="service-card-footer">
+                        <a href="cart-service.html" class="btn btn-primary btn-block">Manage</a>
+                    </div>
+                </div>
+
+                <!-- Order Service -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-card-icon">📋</div>
+                        <h3>Order Service</h3>
+                    </div>
+                    <div class="service-card-body">
+                        <p class="service-card-description">
+                            Handle order creation, management, and tracking. Monitor order status and process
+                            order workflows.
+                        </p>
+                        <div class="service-endpoints">
+                            <strong>Key Endpoints:</strong>
+                            <ul>
+                                <li>GET /orders</li>
+                                <li>POST /orders</li>
+                                <li>PUT /orders/:id</li>
+                                <li>GET /orders/:id/status</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="service-card-footer">
+                        <a href="order-service.html" class="btn btn-primary btn-block">Manage</a>
+                    </div>
+                </div>
+
+                <!-- Payment Service -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-card-icon">💳</div>
+                        <h3>Payment Service</h3>
+                    </div>
+                    <div class="service-card-body">
+                        <p class="service-card-description">
+                            Process payments, manage transactions, and handle refunds. Monitor payment status
+                            and security.
+                        </p>
+                        <div class="service-endpoints">
+                            <strong>Key Endpoints:</strong>
+                            <ul>
+                                <li>POST /payments</li>
+                                <li>GET /transactions</li>
+                                <li>POST /refunds</li>
+                                <li>GET /payments/:id</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="service-card-footer">
+                        <a href="payment-service.html" class="btn btn-primary btn-block">Manage</a>
+                    </div>
+                </div>
+
+                <!-- Inventory Service -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-card-icon">📊</div>
+                        <h3>Inventory Service</h3>
+                    </div>
+                    <div class="service-card-body">
+                        <p class="service-card-description">
+                            Monitor stock levels, manage inventory adjustments, and handle low stock alerts.
+                        </p>
+                        <div class="service-endpoints">
+                            <strong>Key Endpoints:</strong>
+                            <ul>
+                                <li>GET /inventory</li>
+                                <li>PUT /inventory/:id</li>
+                                <li>GET /inventory/alerts</li>
+                                <li>POST /inventory/adjustment</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="service-card-footer">
+                        <a href="inventory-service.html" class="btn btn-primary btn-block">Manage</a>
+                    </div>
+                </div>
+
+                <!-- Notification Service -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-card-icon">🔔</div>
+                        <h3>Notification Service</h3>
+                    </div>
+                    <div class="service-card-body">
+                        <p class="service-card-description">
+                            Send notifications via email, SMS, and push. Manage notification templates and
+                            delivery status.
+                        </p>
+                        <div class="service-endpoints">
+                            <strong>Key Endpoints:</strong>
+                            <ul>
+                                <li>POST /notifications/send</li>
+                                <li>GET /notifications</li>
+                                <li>PUT /notifications/templates</li>
+                                <li>GET /notifications/status</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="service-card-footer">
+                        <a href="notification-service.html" class="btn btn-primary btn-block">Manage</a>
+                    </div>
+                </div>
+
+                <!-- User Service -->
+                <div class="service-card">
+                    <div class="service-card-header">
+                        <div class="service-card-icon">👥</div>
+                        <h3>User Service</h3>
+                    </div>
+                    <div class="service-card-body">
+                        <p class="service-card-description">
+                            Manage user accounts, authentication, and roles. Handle user profiles and permissions.
+                        </p>
+                        <div class="service-endpoints">
+                            <strong>Key Endpoints:</strong>
+                            <ul>
+                                <li>GET /users</li>
+                                <li>POST /users</li>
+                                <li>PUT /users/:id</li>
+                                <li>DELETE /users/:id</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="service-card-footer">
+                        <a href="user-service.html" class="btn btn-primary btn-block">Manage</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture Info -->
+            <div class="services-info" style="margin-top: 40px;">
+                <h2>Service Architecture</h2>
+                <p>
+                    Each service is independently deployable and scalable. Services communicate through the
+                    API Gateway and can be developed in different languages or technologies. This architecture
+                    allows for:
+                </p>
+                <ul style="margin: 15px 0; padding-left: 30px; line-height: 1.8;">
+                    <li><strong>Independent Scaling:</strong> Scale services based on individual demand</li>
+                    <li><strong>Fault Isolation:</strong> Service failures don't affect the entire system</li>
+                    <li><strong>Technology Flexibility:</strong> Each service can use different tech stacks</li>
+                    <li><strong>Parallel Development:</strong> Teams can work on services independently</li>
+                    <li><strong>Easy Maintenance:</strong> Smaller, focused codebases are easier to maintain</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 E-Shop Microservices Platform. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="../index.html">Back to Portal</a>
+                <a href="#">API Documentation</a>
+                <a href="#">Architecture Guide</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

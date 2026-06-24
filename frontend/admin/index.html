@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - E-Commerce</title>
+  <link rel="stylesheet" href="../shared/css/styles.css">
+  <link rel="stylesheet" href="css/admin-styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="admin-header">
+    <div class="container">
+      <div class="flex-between">
+        <h1 class="logo">Admin Dashboard</h1>
+        <div class="flex-center">
+          <span id="admin-name" class="admin-name">Admin User</span>
+          <button id="logout-btn" class="btn btn-danger btn-sm">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar Navigation -->
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <nav class="admin-nav">
+        <a href="#" data-page="dashboard" class="nav-item active">
+          <span class="icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" data-page="products" class="nav-item">
+          <span class="icon">📦</span>
+          <span>Products</span>
+        </a>
+        <a href="#" data-page="inventory" class="nav-item">
+          <span class="icon">📋</span>
+          <span>Inventory</span>
+        </a>
+        <a href="#" data-page="orders" class="nav-item">
+          <span class="icon">🛒</span>
+          <span>Orders</span>
+        </a>
+        <a href="#" data-page="users" class="nav-item">
+          <span class="icon">👥</span>
+          <span>Users</span>
+        </a>
+        <a href="#" data-page="notifications" class="nav-item">
+          <span class="icon">🔔</span>
+          <span>Notifications</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+      <!-- Dashboard Page -->
+      <section id="dashboard" class="page active">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Welcome to the admin dashboard</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background-color: #dbeafe;">📦</div>
+            <div class="stat-content">
+              <h3>Total Products</h3>
+              <p id="stat-products" class="stat-value">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background-color: #dcfce7;">🛒</div>
+            <div class="stat-content">
+              <h3>Total Orders</h3>
+              <p id="stat-orders" class="stat-value">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background-color: #fef3c7;">👥</div>
+            <div class="stat-content">
+              <h3>Total Users</h3>
+              <p id="stat-users" class="stat-value">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background-color: #fee2e2;">⚠️</div>
+            <div class="stat-content">
+              <h3>Low Stock Items</h3>
+              <p id="stat-low-stock" class="stat-value">0</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-top: var(--spacing-2xl);">
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Orders</h3>
+            </div>
+            <div id="recent-orders" class="card-body">
+              <div class="loading">Loading...</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Low Stock Alert</h3>
+            </div>
+            <div id="low-stock-items" class="card-body">
+              <div class="loading">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Page -->
+      <section id="products" class="page">
+        <div class="page-header">
+          <div class="flex-between">
+            <div>
+              <h1>Products</h1>
+              <p>Manage your product catalog</p>
+            </div>
+            <button class="btn btn-primary" id="add-product-btn">Add Product</button>
+          </div>
+        </div>
+
+        <div class="search-box">
+          <input type="text" id="products-search" placeholder="Search products...">
+        </div>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-table">
+              <tr><td colspan="6" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Inventory Page -->
+      <section id="inventory" class="page">
+        <div class="page-header">
+          <h1>Inventory Management</h1>
+          <p>Monitor and manage stock levels</p>
+        </div>
+
+        <div class="search-box">
+          <input type="text" id="inventory-search" placeholder="Search products...">
+        </div>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Current Stock</th>
+                <th>Reorder Level</th>
+                <th>Supplier</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table">
+              <tr><td colspan="7" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Orders Page -->
+      <section id="orders" class="page">
+        <div class="page-header">
+          <h1>Orders</h1>
+          <p>Manage customer orders</p>
+        </div>
+
+        <div class="filters">
+          <input type="text" id="orders-search" placeholder="Search orders...">
+          <select id="orders-filter">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+          </select>
+        </div>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table">
+              <tr><td colspan="7" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Users Page -->
+      <section id="users" class="page">
+        <div class="page-header">
+          <h1>Users</h1>
+          <p>Manage user accounts</p>
+        </div>
+
+        <div class="search-box">
+          <input type="text" id="users-search" placeholder="Search users...">
+        </div>
+
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Join Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-table">
+              <tr><td colspan="7" class="loading">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Notifications Page -->
+      <section id="notifications" class="page">
+        <div class="page-header">
+          <div class="flex-between">
+            <div>
+              <h1>Notifications</h1>
+              <p>Send notifications to users</p>
+            </div>
+            <button class="btn btn-primary" id="send-notification-btn">Send Notification</button>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Notifications</h3>
+            </div>
+            <div id="notifications-list" class="card-body">
+              <div class="loading">Loading...</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Send New Notification</h3>
+            </div>
+            <form id="notification-form" class="card-body">
+              <div class="form-group">
+                <label>Recipient Type</label>
+                <select name="recipientType" required>
+                  <option value="all">All Users</option>
+                  <option value="user">Single User</option>
+                </select>
+              </div>
+              <div class="form-group" id="user-select-group" style="display: none;">
+                <label>Select User</label>
+                <select name="userId">
+                  <option value="">Choose a user</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" placeholder="Notification title" required>
+              </div>
+              <div class="form-group">
+                <label>Message</label>
+                <textarea name="message" placeholder="Notification message" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add/Edit Product</h2>
+        <button type="button" class="close-btn">&times;</button>
+      </div>
+      <form id="product-form" class="modal-body">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <input type="text" name="category" required>
+        </div>
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" name="price" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" name="stock" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="close-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 E-Commerce Platform Admin. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="js/admin-app.js"></script>
+</body>
+</html>

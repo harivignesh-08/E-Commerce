@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Portal - E-Commerce</title>
+  <link rel="stylesheet" href="../shared/css/styles.css">
+  <link rel="stylesheet" href="css/user-styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="flex-between">
+        <h1 class="logo">E-Commerce</h1>
+        <nav class="nav">
+          <a href="#" data-page="home" class="nav-link active">Home</a>
+          <a href="#" data-page="products" class="nav-link">Products</a>
+          <a href="#" data-page="cart" class="nav-link">Cart <span class="cart-badge">0</span></a>
+          <a href="#" data-page="orders" class="nav-link">Orders</a>
+          <a href="#" data-page="profile" class="nav-link">Profile</a>
+        </nav>
+        <button id="logout-btn" class="btn btn-danger btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Home Page -->
+    <section id="home" class="page active">
+      <div class="container">
+        <div class="hero">
+          <h1>Welcome to Our Store</h1>
+          <p>Discover amazing products at great prices</p>
+          <button class="btn btn-primary btn-lg" data-page="products">Start Shopping</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products Page -->
+    <section id="products" class="page">
+      <div class="container">
+        <div class="page-header">
+          <h1>Products</h1>
+          <div class="filters">
+            <input type="text" id="search-input" placeholder="Search products..." class="search-box">
+            <select id="category-filter" class="filter-select">
+              <option value="">All Categories</option>
+              <option value="electronics">Electronics</option>
+              <option value="accessories">Accessories</option>
+              <option value="cables">Cables</option>
+            </select>
+          </div>
+        </div>
+        <div id="products-grid" class="grid grid-3">
+          <div class="loading">Loading products...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cart Page -->
+    <section id="cart" class="page">
+      <div class="container">
+        <h1>Shopping Cart</h1>
+        <div class="grid grid-2" style="grid-template-columns: 2fr 1fr;">
+          <div>
+            <div id="cart-items" class="cart-items">
+              <div class="empty-state">
+                <h3>Your cart is empty</h3>
+                <p>Start shopping to add items to your cart</p>
+                <button class="btn btn-primary" data-page="products">Continue Shopping</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <h3>Order Summary</h3>
+              </div>
+              <div class="card-body">
+                <div class="flex-between" style="margin-bottom: var(--spacing-md);">
+                  <span>Subtotal:</span>
+                  <span id="subtotal">$0.00</span>
+                </div>
+                <div class="flex-between" style="margin-bottom: var(--spacing-md);">
+                  <span>Shipping:</span>
+                  <span id="shipping">$10.00</span>
+                </div>
+                <div class="flex-between" style="margin-bottom: var(--spacing-lg); font-weight: 600; font-size: 1.1rem; border-top: 1px solid var(--border-color); padding-top: var(--spacing-md);">
+                  <span>Total:</span>
+                  <span id="total">$10.00</span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button class="btn btn-primary btn-block" data-page="checkout">Proceed to Checkout</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Checkout Page -->
+    <section id="checkout" class="page">
+      <div class="container">
+        <h1>Checkout</h1>
+        <div class="grid grid-2">
+          <form id="checkout-form" class="checkout-form">
+            <div class="card">
+              <div class="card-header">
+                <h3>Shipping Address</h3>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label>Full Name</label>
+                  <input type="text" name="fullName" required>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="tel" name="phone" required>
+                </div>
+                <div class="form-group">
+                  <label>Address</label>
+                  <input type="text" name="address" required>
+                </div>
+                <div class="flex gap-md">
+                  <div class="form-group" style="flex: 1;">
+                    <label>City</label>
+                    <input type="text" name="city" required>
+                  </div>
+                  <div class="form-group" style="flex: 1;">
+                    <label>State</label>
+                    <input type="text" name="state" required>
+                  </div>
+                  <div class="form-group" style="flex: 1;">
+                    <label>ZIP</label>
+                    <input type="text" name="zip" required>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3>Payment Information</h3>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label>Card Number</label>
+                  <input type="text" name="cardNumber" placeholder="1234 5678 9012 3456" required>
+                </div>
+                <div class="flex gap-md">
+                  <div class="form-group" style="flex: 1;">
+                    <label>Expiry (MM/YY)</label>
+                    <input type="text" name="expiry" placeholder="MM/YY" required>
+                  </div>
+                  <div class="form-group" style="flex: 1;">
+                    <label>CVC</label>
+                    <input type="text" name="cvc" placeholder="123" required>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <button type="button" class="btn btn-secondary" data-page="cart">Cancel</button>
+                <button type="submit" class="btn btn-success">Complete Order</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Order Summary</h3>
+            </div>
+            <div class="card-body">
+              <div id="checkout-items" style="margin-bottom: var(--spacing-lg);">
+                <div class="loading">Loading...</div>
+              </div>
+              <div class="flex-between" style="margin-bottom: var(--spacing-md);">
+                <span>Subtotal:</span>
+                <span id="checkout-subtotal">$0.00</span>
+              </div>
+              <div class="flex-between" style="margin-bottom: var(--spacing-md);">
+                <span>Shipping:</span>
+                <span>$10.00</span>
+              </div>
+              <div class="flex-between" style="font-weight: 600; font-size: 1.2rem; border-top: 1px solid var(--border-color); padding-top: var(--spacing-md);">
+                <span>Total:</span>
+                <span id="checkout-total">$10.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders Page -->
+    <section id="orders" class="page">
+      <div class="container">
+        <h1>My Orders</h1>
+        <div id="orders-list" class="orders-list">
+          <div class="loading">Loading orders...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profile Page -->
+    <section id="profile" class="page">
+      <div class="container">
+        <h1>My Profile</h1>
+        <form id="profile-form" class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Personal Information</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="profile-name" required>
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="profile-email" required>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="profile-phone">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Address</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="profile-address">
+              </div>
+              <div class="flex gap-md">
+                <div class="form-group" style="flex: 1;">
+                  <label>City</label>
+                  <input type="text" id="profile-city">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label>State</label>
+                  <input type="text" id="profile-state">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label>ZIP</label>
+                  <input type="text" id="profile-zip">
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2024 E-Commerce Platform. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="js/user-app.js"></script>
+</body>
+</html>

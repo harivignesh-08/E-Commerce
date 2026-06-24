@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Service - E-Commerce</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="./css/service-styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">Inventory Service</div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Back to Portal</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content service-content">
+        <div class="container">
+            <div class="service-header">
+                <h1>Inventory Management Service</h1>
+                <p>Monitor stock levels and manage inventory</p>
+            </div>
+
+            <!-- Service Stats -->
+            <div class="service-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-stock">0</div>
+                    <div class="stat-label">Total Stock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="low-stock">0</div>
+                    <div class="stat-label">Low Stock Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="reserved-items">0</div>
+                    <div class="stat-label">Reserved Items</div>
+                </div>
+            </div>
+
+            <!-- Inventory Controls -->
+            <div class="service-controls">
+                <input type="text" id="inventory-search" placeholder="Search products..." class="search-box">
+                <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="table-responsive">
+                <table class="service-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Available</th>
+                            <th>Reserved</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="service-inventory-tbody">
+                        <tr><td colspan="6" class="loading">Loading inventory...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Adjust Stock Section -->
+            <div class="service-section" style="margin-top: 40px;">
+                <h2>Adjust Stock Levels</h2>
+                <form id="adjust-stock-form" style="max-width: 500px;">
+                    <div class="form-row">
+                        <select id="product-select" class="form-input" required>
+                            <option value="">Select Product</option>
+                        </select>
+                    </div>
+                    <div class="form-row full">
+                        <input type="number" id="adjustment-qty" placeholder="Adjustment Quantity" class="form-input" required>
+                    </div>
+                    <div class="form-row full">
+                        <select id="adjustment-reason" class="form-input" required>
+                            <option value="">Select Reason</option>
+                            <option value="restock">Restock</option>
+                            <option value="damage">Damage</option>
+                            <option value="loss">Loss</option>
+                            <option value="correction">Inventory Correction</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Adjust Stock</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Inventory Service API | Version 1.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script>
+        let allInventory = [];
+
+        async function loadServiceInventory() {
+            console.log('[v0] Loading inventory for service view');
+            try {
+                allInventory = await api.getInventory();
+                renderServiceInventory(allInventory);
+                updateInventoryStats();
+                populateProductSelect();
+            } catch (error) {
+                console.error('[v0] Error loading inventory:', error);
+            }
+        }
+
+        function renderServiceInventory(inventory) {
+            const tbody = document.getElementById('service-inventory-tbody');
+            if (!inventory || inventory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-message">No inventory data</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = inventory.map(item => {
+                const status = item.available < 10 ? 'low' : 'ok';
+                const statusText = item.available < 10 ? 'LOW STOCK' : 'OK';
+                return `
+                    <tr>
+                        <td>${item.productName}</td>
+                        <td>${item.available}</td>
+                        <td>${item.reserved}</td>
+                        <td>${item.available + item.reserved}</td>
+                        <td><span class="badge badge-${status}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-primary btn-small" onclick="editInventory(${item.productId})">Edit</button>
+                            <button class="btn btn-secondary btn-small" onclick="viewInventoryHistory(${item.productId})">History</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateInventoryStats() {
+            const totalStock = allInventory.reduce((sum, item) => sum + item.available, 0);
+            const lowStock = allInventory.filter(item => item.lowStockAlert).length;
+            const reserved = allInventory.reduce((sum, item) => sum + item.reserved, 0);
+            
+            document.getElementById('total-stock').textContent = totalStock;
+            document.getElementById('low-stock').textContent = lowStock;
+            document.getElementById('reserved-items').textContent = reserved;
+        }
+
+        function populateProductSelect() {
+            const select = document.getElementById('product-select');
+            select.innerHTML = '<option value="">Select Product</option>';
+            allInventory.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.productId;
+                option.textContent = `${item.productName} (Available: ${item.available})`;
+                select.appendChild(option);
+            });
+        }
+
+        function editInventory(productId) {
+            const item = allInventory.find(i => i.productId === productId);
+            if (item) {
+                document.getElementById('product-select').value = productId;
+            }
+        }
+
+        function viewInventoryHistory(productId) {
+            const item = allInventory.find(i => i.productId === productId);
+            if (item) {
+                alert(`Inventory History for ${item.productName}\n\nCurrent Stock: ${item.available}\nReserved: ${item.reserved}\nTotal: ${item.available + item.reserved}`);
+            }
+        }
+
+        function generateReport() {
+            console.log('[v0] Generating inventory report');
+            const report = {
+                totalItems: allInventory.length,
+                totalStock: allInventory.reduce((sum, i) => sum + i.available, 0),
+                lowStockItems: allInventory.filter(i => i.lowStockAlert).length,
+                timestamp: new Date().toISOString()
+            };
+            alert(`Inventory Report:\nTotal Products: ${report.totalItems}\nTotal Stock: ${report.totalStock}\nLow Stock Items: ${report.lowStockItems}`);
+        }
+
+        // Search functionality
+        document.getElementById('inventory-search')?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#service-inventory-tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Form submission
+        document.getElementById('adjust-stock-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const productId = document.getElementById('product-select').value;
+            const qty = document.getElementById('adjustment-qty').value;
+            const reason = document.getElementById('adjustment-reason').value;
+            
+            if (productId && qty && reason) {
+                console.log('[v0] Stock adjustment:', { productId, qty, reason });
+                alert(`Stock adjusted by ${qty} units for product ${productId}\nReason: ${reason}`);
+                document.getElementById('adjust-stock-form').reset();
+                loadServiceInventory();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadServiceInventory);
+    </script>
+</body>
+</html>

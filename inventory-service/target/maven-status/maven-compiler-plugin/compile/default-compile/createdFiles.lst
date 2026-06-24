@@ -1,0 +1,12 @@
+com\ecommerce\inventory\entity\Inventory.class
+com\ecommerce\inventory\InventoryServiceApplication.class
+com\ecommerce\inventory\config\OpenApiConfig.class
+com\ecommerce\inventory\entity\Inventory$InventoryBuilder.class
+com\ecommerce\inventory\dto\InventoryResponse.class
+com\ecommerce\inventory\service\InventoryService.class
+com\ecommerce\inventory\dto\InventoryResponse$InventoryResponseBuilder.class
+com\ecommerce\inventory\controller\InventoryController.class
+com\ecommerce\inventory\dto\InventoryRequest.class
+com\ecommerce\inventory\config\SecurityConfig.class
+com\ecommerce\inventory\dto\StockUpdateRequest.class
+com\ecommerce\inventory\repository\InventoryRepository.class
